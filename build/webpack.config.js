@@ -3,16 +3,18 @@ const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-const root = path.resolve(__dirname, '../src/pages');
 const isDev = process.env.NODE_ENV === 'development';
+const pageRoot = path.resolve(__dirname, '../src/pages');
+const dist = path.resolve(__dirname, '../dist');
+const entryScriptExt = 'ts';// 入口文件是ts文件
 
 const config = {
-  devtool: 'inline-source-map',
+  devtool: isDev ? 'inline-source-map' : 'none',
   mode: 'development',
   entry: {},
   output: {
     filename: 'assets/js/[name].[hash:8].js',
-    path: path.resolve(__dirname, '../dist'),
+    path: dist,
   },
   resolve: {
     extensions: ['.tsx', '.js', '.jsx'],
@@ -74,22 +76,14 @@ isDev && (config.devServer = {
   port: 10086,
 });
 
-const pages = [];
-const dirList = readDir(root);
-dirList.forEach(dir => {
-  const entry = path.resolve(dir, 'index.ts');
-  const page = path.resolve(dir, 'index.html');
-  if (isFileExistAsync(entry) && isFileExistAsync(page)) {
-    const name = dir.replace(`${root}/`, '');
-    pages.push({
-      name,
-      entry,
-      page,
-    });
-    config.entry[name] = entry;
-    config.plugins.push(new HtmlWebpackPlugin({
+const pageList = readDir(pageRoot);
+pageList.forEach(dir => {
+  const entry = path.resolve(dir, `index.${entryScriptExt}`);
+  if (isFileExistAsync(entry)) {
+    const { name } = path.parse(dir);
+    const page = path.resolve(dir, 'index.html');
+    const htmlWebpackPluginConfig = {
       filename: `${name}.html`,
-      template: page,
       chunks: [name],
       minify: !isDev && {
         removeAttributeQuotes:true,
@@ -98,7 +92,12 @@ dirList.forEach(dir => {
         removeScriptTypeAttributes:true,
         removeStyleLinkTypeAttributes:true
       },
-    }));
+    };
+    if (isFileExistAsync(page)) {
+      htmlWebpackPluginConfig.template = page;
+    }
+    config.entry[name] = entry;
+    config.plugins.push(new HtmlWebpackPlugin(htmlWebpackPluginConfig));
   }
 });
 
@@ -115,12 +114,12 @@ function readDir(dir) {
   let res = [];
   const list = fs.readdirSync(dir);
 	list.forEach(file => {
-    const cDir = path.resolve(dir, file);
-		const info = fs.statSync(cDir);	
+    const pageDir = path.resolve(dir, file);
+		const info = fs.statSync(pageDir);	
 		if(info.isDirectory()){
-      res.push(cDir);
+      res.push(pageDir);
       // 暂时不要多层嵌套
-			// res = [...res, ...readDir(cDir)];
+			// res = [...res, ...readDir(pageDir)];
 		}
   });
   return res;
