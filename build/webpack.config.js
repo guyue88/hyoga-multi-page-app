@@ -76,8 +76,7 @@ isDev && (config.devServer = {
   port: 10086,
 });
 
-const pageList = readDir(pageRoot);
-pageList.forEach(dir => {
+readDir(pageRoot).forEach(dir => {
   const entry = path.resolve(dir, `index.${entryScriptExt}`);
   if (isFileExistAsync(entry)) {
     const { name } = path.parse(dir);
@@ -101,6 +100,11 @@ pageList.forEach(dir => {
   }
 });
 
+/**
+ * 同步判断文件是否存在
+ * 
+ * @param {string} file 文件地址
+ */
 function isFileExistAsync(file) {
   try {
     fs.accessSync(file, fs.constants.F_OK);
@@ -110,6 +114,11 @@ function isFileExistAsync(file) {
   return true;
 }
 
+/**
+ * 遍历某个文件夹，找出该文件夹下的所有一级子文件夹
+ * 
+ * @param {string} dir 文件目录地址
+ */
 function readDir(dir) {
   let res = [];
   const list = fs.readdirSync(dir);
