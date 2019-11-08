@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 const pageRoot = path.resolve(__dirname, '../src/pages');
@@ -39,7 +40,7 @@ const config = {
     }, {
       test: /\.scss$/,
       use: [{
-        loader: 'style-loader',
+        loader: MiniCssExtractPlugin.loader,
       }, {
         loader: 'css-loader',
       }, {
@@ -65,6 +66,11 @@ const config = {
     }, ],
   },
   plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'assets/css/[name].[hash:8].css',
+      chunkFilename: '[id].css',
+      ignoreOrder: false,
+    }),
     new CleanWebpackPlugin(),
   ],
 };
@@ -72,7 +78,7 @@ const config = {
 isDev && (config.devServer = {
   contentBase: path.join(__dirname, 'dist'),
   compress: true,
-  hot: true,
+  inline: true,
   port: 10086,
 });
 
