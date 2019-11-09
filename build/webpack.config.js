@@ -84,7 +84,7 @@ isDev && (config.devServer = {
 
 readDir(pageRoot).forEach(dir => {
   const entry = path.resolve(dir, `index.${entryScriptExt}`);
-  if (isFileExistAsync(entry)) {
+  if (isFileExistSync(entry)) {
     const { name } = path.parse(dir);
     const page = path.resolve(dir, 'index.html');
     const htmlWebpackPluginConfig = {
@@ -98,7 +98,7 @@ readDir(pageRoot).forEach(dir => {
         removeStyleLinkTypeAttributes:true
       },
     };
-    if (isFileExistAsync(page)) {
+    if (isFileExistSync(page)) {
       htmlWebpackPluginConfig.template = page;
     }
     config.entry[name] = entry;
@@ -111,7 +111,7 @@ readDir(pageRoot).forEach(dir => {
  * 
  * @param {string} file 文件地址
  */
-function isFileExistAsync(file) {
+function isFileExistSync(file) {
   try {
     fs.accessSync(file, fs.constants.F_OK);
   } catch (err) {
