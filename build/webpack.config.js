@@ -41,6 +41,9 @@ const config = {
       test: /\.scss$/,
       use: [{
         loader: MiniCssExtractPlugin.loader,
+        options: {
+          publicPath: '../../',
+        }
       }, {
         loader: 'css-loader',
       }, {
@@ -52,7 +55,8 @@ const config = {
         loader: 'url-loader',
         options: {
           limit: 8192,
-          name:'assets/images/[name]-[hash:8].[ext]',
+          name:'[name]-[hash:8].[ext]',
+          outputPath:'assets/images/',
         }
       }]
     }, {
@@ -60,7 +64,7 @@ const config = {
       use: {
         loader: 'html-loader',
         options: {
-          attrs: [':data-src', ':src'],
+          attrs: [':data-src', ':src', 'link:href'],
         }
       },
     }, ],
@@ -80,6 +84,7 @@ isDev && (config.devServer = {
   compress: true,
   inline: true,
   port: 10086,
+  host: '0.0.0.0',
 });
 
 readDir(pageRoot).forEach(dir => {
