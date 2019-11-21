@@ -50,6 +50,18 @@ const config = {
         loader: 'sass-loader',
       }],
     }, {
+      test: /\.less$/,
+      use: [{
+        loader: MiniCssExtractPlugin.loader,
+        options: {
+          publicPath: '../../',
+        }
+      }, {
+        loader: 'css-loader',
+      }, {
+        loader: 'less-loader',
+      }],
+    }, {
       test: /\.(png|jpg|gif|jpeg|webp|svg|bmp|eot|ttf|woff)$/,
       use: [{
         loader: 'url-loader',
